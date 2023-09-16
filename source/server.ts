@@ -1,4 +1,5 @@
 import http from 'http';
+import cors from 'cors';
 import createApp from './app';
 import config from './config/config';
 import logging from './config/logging';

@@ -17,6 +17,7 @@ const NAMESPACE = 'User Controller';
 
 interface IResponseToken {
     token: string;
+    expiresIn: number;
     message: string;
 }
 
@@ -40,7 +41,7 @@ const authorize = (req: Request, res: Response, next: NextFunction) => {
         };
     let data: IResponseError | IResponseToken;
 
-    signJWT(user, (error: Error | null, token: string | null) => {
+    signJWT(user, (error: Error | null, token: string | null, expiresIn: number | null) => {
         if (error) {
             data = {
                 error,
@@ -49,9 +50,10 @@ const authorize = (req: Request, res: Response, next: NextFunction) => {
 
             logging.error(NAMESPACE, data.message, error);
             return res.status(unauthorized).json({ data });
-        } else if (token) {
+        } else if (token && expiresIn) {
             data = {
                 token,
+                expiresIn,
                 message: userAuthorized
             };
 

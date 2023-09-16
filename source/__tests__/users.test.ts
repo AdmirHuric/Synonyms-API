@@ -3,6 +3,7 @@ import IUser from '../interfaces/userInterface';
 import { signJWT } from '../middleware/jwtMiddleware';
 import createApp from '../app';
 import config from '../config/config';
+import { number } from 'joi';
 
 const app = createApp(),
     { success, unauthorized, unproccesable } = config.server.statusCodes,
@@ -36,6 +37,7 @@ describe('users', () => {
                 expect(body).toEqual({
                     data: {
                         token: expect.any(String),
+                        expiresIn: expect.any(Number),
                         message: userAuthorized
                     }
                 });

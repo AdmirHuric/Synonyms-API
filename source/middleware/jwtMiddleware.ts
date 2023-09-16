@@ -7,7 +7,7 @@ import config from '../config/config';
 
 const NAMESPACE = 'Auth Middleware';
 
-const signJWT = (user: IUser, callback: (error: Error | null, token: string | null) => void): void => {
+const signJWT = (user: IUser, callback: (error: Error | null, token: string | null, expiresIn: number | null) => void): void => {
     const { issuer, secret } = config.server.token,
         timeSinceEpoch = new Date().getTime(),
         expirationTime = timeSinceEpoch + Number(config.server.token.expireTime) * 100000, //in miliseconds
@@ -26,15 +26,15 @@ const signJWT = (user: IUser, callback: (error: Error | null, token: string | nu
             },
             (error, token) => {
                 if (error) {
-                    callback(error, null);
+                    callback(error, null, null);
                 } else if (token) {
-                    callback(null, token);
+                    callback(null, token, expirationTime);
                 }
             }
         );
     } catch (error: any) {
         logging.error(NAMESPACE, error.message, error);
-        callback(error, null);
+        callback(error, null, null);
     }
 };
 

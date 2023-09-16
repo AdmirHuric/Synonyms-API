@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import synonymsRoutes from './routes/synonymsRoutes';
 import usersRoutes from './routes/usersRoutes';
 import config from './config/config';
@@ -7,7 +8,13 @@ import logging from './config/logging';
 
 const NAMESPACE = 'Server',
     app = express(),
-    router = Router();
+    router = Router(),
+    corsOptions = {
+        origin: '*',
+        port: config.server.port,
+        credentials: true,
+        optionSuccessStatus: 200
+    };
 
 export default function createApp() {
     /** Logging the request */
@@ -25,21 +32,7 @@ export default function createApp() {
     router.use(bodyParser.urlencoded({ extended: false }));
     router.use(bodyParser.json());
 
-    /** Simple Rules of API
-     * For assigment purposes we allow access from everywhere
-     * If needed we would allow IPs here
-     */
-    router.use((req, res, next) => {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-        if (req.method == 'OPTIONS') {
-            res.header('Access-Control-Allow Methods', 'GET PATCH DELETE POST PUT');
-            return res.status(200).json({});
-        }
-
-        next();
-    });
+    router.use(cors(corsOptions));
 
     /** Routes */
     router.use('/users', usersRoutes);
