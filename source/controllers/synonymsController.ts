@@ -11,6 +11,9 @@ const NAMESPACE = 'Synonym Controller';
 const synonymsGraph = new SynonymsGraph(),
     searchSynonyms = (word: string): string[] => {
         return synonymsGraph.searchSynonyms(word);
+    },
+    toLowerCase = (word: string): string => {
+        return word.toLowerCase();
     };
 
 const addSynonym = (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +22,7 @@ const addSynonym = (req: Request, res: Response, next: NextFunction) => {
         { conflict, success } = config.server.statusCodes,
         loggedObject: ISynonym = { word, synonym };
     let data: IResponseData = {
-        synonyms: searchSynonyms(word.toLowerCase()),
+        synonyms: searchSynonyms(toLowerCase(word)),
         message: ''
     };
 
@@ -29,15 +32,15 @@ const addSynonym = (req: Request, res: Response, next: NextFunction) => {
         return res.status(conflict).json({ data });
     }
 
-    if (synonymsGraph.hasSynonym(word, synonym)) {
+    if (synonymsGraph.hasSynonym(toLowerCase(word), toLowerCase(synonym))) {
         data.message = synonymAlreadyAdded;
         logging.warn(NAMESPACE, data.message, loggedObject);
         return res.status(conflict).json({ data });
     }
 
-    synonymsGraph.addSynonym(word.toLowerCase(), synonym.toLowerCase());
+    synonymsGraph.addSynonym(toLowerCase(word), toLowerCase(synonym));
     data = {
-        synonyms: searchSynonyms(word.toLowerCase()),
+        synonyms: searchSynonyms(toLowerCase(word)),
         message: synonymSuccessfullyAdded
     };
 
@@ -49,7 +52,7 @@ const getSynonyms = (req: Request, res: Response, next: NextFunction) => {
     const { word } = req.params,
         { synonymsSuccessfullyReturned, synonymsListEmpty } = config.server.messages,
         loggedObject: ISynonym = { word },
-        synonyms = searchSynonyms(word.toLowerCase()),
+        synonyms = searchSynonyms(toLowerCase(word)),
         data: IResponseData = {
             synonyms,
             message: synonyms.length > 0 ? synonymsSuccessfullyReturned : synonymsListEmpty
@@ -66,7 +69,7 @@ const deleteSynonym = (req: Request, res: Response, next: NextFunction) => {
         loggedObject: ISynonym = { word, synonym };
     let data: IResponseData | IResponseError;
 
-    if (!synonymsGraph.hasSynonym(word, synonym)) {
+    if (!synonymsGraph.hasSynonym(toLowerCase(word), toLowerCase(synonym))) {
         const error = new Error(synonymDoesntExist.replace('${synonym}', synonym));
         data = {
             error,
@@ -77,9 +80,9 @@ const deleteSynonym = (req: Request, res: Response, next: NextFunction) => {
         return res.status(notFound).json({ data });
     }
 
-    synonymsGraph.deleteSynonym(word.toLowerCase(), synonym.toLowerCase());
+    synonymsGraph.deleteSynonym(toLowerCase(word), toLowerCase(synonym));
     data = {
-        synonyms: searchSynonyms(word.toLowerCase()),
+        synonyms: searchSynonyms(toLowerCase(word)),
         message: synonymSuccessfullyDeleted
     };
 
