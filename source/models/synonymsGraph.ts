@@ -18,7 +18,6 @@ export default class SynonymsGraph {
     deleteSynonym(word: string, synonym: string) {
         if (this.graph.has(word) && this.graph.has(synonym)) {
             this.removeEdge(word, synonym);
-            //this.removeEdge(synonym, word);
         }
     }
 
