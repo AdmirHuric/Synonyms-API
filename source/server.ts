@@ -1,5 +1,4 @@
 import http from 'http';
-import cors from 'cors';
 import createApp from './app';
 import config from './config/config';
 import logging from './config/logging';
@@ -8,6 +7,10 @@ const NAMESPACE = 'Server',
     app = createApp();
 
 let port: Number | string = config.server.port;
+
+app.get('/', (req, res) => {
+    res.send('Synonyms API');
+});
 
 /** Assign random port number in 5000 - 6500 range for running tests */
 if (config.server.node_env == 'test') {
